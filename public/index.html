@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Update User Balance</title>
+  </head>
+  <body>
+    <h1>Update User Balance</h1>
+    <form id="updateBalanceForm" onsubmit="updateBalance()">
+      <label for="userId">User ID:</label>
+      <input type="text" id="userId" name="userId" required /><br /><br />
+
+      <label for="amount">Amount:</label>
+      <input type="number" id="amount" name="amount" required /><br />
+      <small>Amount to be increment or decrement.</small>
+      <br />
+      <small style="color: rgb(248, 75, 75)" id="error1"></small>
+      <br /><br />
+
+      <button type="submit">Update Balance</button>
+    </form>
+
+    <h2>Check User Balance</h2>
+    <form id="checkBalanceForm">
+      <label for="checkUserId">User ID:</label>
+      <input type="text" id="checkUserId" name="checkUserId" required /><br />
+      <small style="color: rgb(248, 75, 75)" id="error2"></small>
+      <br /><br />
+      <button type="button" onclick="checkBalance()">Check Balance</button>
+    </form>
+
+    <div id="balanceResult"></div>
+
+    <script>
+      async function updateBalance(event) {
+        event.preventDefault();
+
+        const userId = document.getElementById("userId").value;
+        const amount = document.getElementById("amount").value;
+
+        if (!userId || !amount) {
+          document.getElementById("error1").innerText =
+            "Please enter a user ID and an amount.";
+          return;
+        }
+
+        try {
+          const response = await fetch("/update-balance", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userId, amount }),
+          });
+
+          const data = await response.json();
+          alert(`Balance updated successfully. New balance: ${data.balance}`);
+        } catch (error) {
+          alert(`Error updating balance: ${error.message}`);
+        }
+      }
+
+      async function checkBalance() {
+        const userId = document.getElementById("checkUserId").value;
+
+        if (!userId) {
+          document.getElementById("error2").innerText =
+            "Please enter a user ID.";
+          return;
+        }
+
+        try {
+          const response = await fetch(`/balance/${userId}`);
+          const data = await response.json();
+
+          document.getElementById(
+            "balanceResult"
+          ).innerText = `Current Balance for User ${userId}: ${data.balance}`;
+        } catch (error) {
+          alert(`Error checking balance: ${error.message}`);
+        }
+      }
+
+      document
+        .getElementById("updateBalanceForm")
+        .addEventListener("submit", updateBalance);
+    </script>
+  </body>
+</html>
