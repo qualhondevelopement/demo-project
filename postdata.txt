@@ -1,4 +1,4 @@
 {
-  "userId": 2,
+  "userId": 1,
   "amount": -2
 }
